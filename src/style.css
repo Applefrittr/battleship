@@ -1,0 +1,71 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+@font-face {
+    font-family: Machine;
+    src: url(MachineStd.otf);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    position: relative;
+}
+
+#battleship {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9rem;
+    font-family: Machine, san-serif;
+    background: linear-gradient(rgba(225,225,225), rgb(78, 78, 78), rgba(225,225,225));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: absolute;
+    top: 45%;
+    transition: top ease-in-out 1s;
+}
+
+#mp3 {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 1rem;
+}
+
+#new-game {
+    position: absolute;
+    top: 60%;
+}
+
+.screen-display {
+    width: 100%;
+    background-color: antiquewhite;
+    margin: 160px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.grid-square {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border:solid black 1px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-template-rows: repeat(10, 1fr);
+    padding: 5rem;
+}
