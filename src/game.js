@@ -4,17 +4,18 @@ import * as DOM from "./DOM.js"
 // createFleet will create a fleet of ships and place them randomly on the passed gameboard parameter.  The logic ensures that the ships do not overlap and also randomizes whether the ships are placed
 // horizontally or vertically
 export const createFleet = (board) => {
-  const fleetHps = [2, 3, 3, 4, 5]; // fleet array.  Standard Battleship game has 5 ships with the following hps values: 2, 3, 3, 4, 5.
-  fleetHps.forEach((hps) => {
+  const fleet = [{"hps": 2, "name": "Patrol Boat"}, {"hps": 3, "name": "Submarine"}, {"hps": 3, "name": "Destroyer"}, {"hps": 4, "name": "Battleship"}, {"hps": 5, "name": "Carrier"}]; // fleet array.  Standard Battleship game has 5 ships with the following boat.hps values: 2, 3, 3, 4, 5.
+  fleet.forEach((boat) => {
     let dir = Math.random() * 100; // Random number generator to determine whether the ship is placed vertically or horizontally
-    if (dir >= 50) {
+    if (dir >= 50) { // <--- horizontal
       let row = Math.round(Math.random() * 9);
-      let col = Math.round(Math.random() * (10 - hps));
-      switch (hps) {
+      let col = Math.round(Math.random() * (10 - boat.hps));
+      // Place ship horizontally, switch statement will detect if a new ship placement overlaps an already placed ship
+      switch (boat.hps) {
         case 2:
           while (board.grid[row][col].ship || board.grid[row][col + 1].ship) {
             row = Math.round(Math.random() * 9);
-            col = Math.round(Math.random() * (10 - hps));
+            col = Math.round(Math.random() * (10 - boat.hps));
           }
           break;
         case 3:
@@ -24,7 +25,7 @@ export const createFleet = (board) => {
             board.grid[row][col + 2].ship
           ) {
             row = Math.round(Math.random() * 9);
-            col = Math.round(Math.random() * (10 - hps));
+            col = Math.round(Math.random() * (10 - boat.hps));
           }
           break;
         case 4:
@@ -35,7 +36,7 @@ export const createFleet = (board) => {
             board.grid[row][col + 3].ship
           ) {
             row = Math.round(Math.random() * 9);
-            col = Math.round(Math.random() * (10 - hps));
+            col = Math.round(Math.random() * (10 - boat.hps));
           }
           break;
         case 5:
@@ -47,19 +48,20 @@ export const createFleet = (board) => {
             board.grid[row][col + 4].ship
           ) {
             row = Math.round(Math.random() * 9);
-            col = Math.round(Math.random() * (10 - hps));
+            col = Math.round(Math.random() * (10 - boat.hps));
           }
           break;
       }
       console.log(row, col, dir);
-      board.newShip(row, col, hps, "x");
-    } else {
-      let row = Math.round(Math.random() * (10 - hps));
+      board.newShip(row, col, boat.hps, boat.name, "x");
+    } else {   // <-- vertical
+      let row = Math.round(Math.random() * (10 - boat.hps));
       let col = Math.round(Math.random() * 9);
-      switch (hps) {
+      // Place ship vertically, switch statement will detect if a new ship placement overlaps an already placed ship
+      switch (boat.hps) {
         case 2:
           while (board.grid[row][col].ship || board.grid[row + 1][col].ship) {
-            row = Math.round(Math.random() * (10 - hps));
+            row = Math.round(Math.random() * (10 - boat.hps));
             col = Math.round(Math.random() * 9);
           }
           break;
@@ -69,7 +71,7 @@ export const createFleet = (board) => {
             board.grid[row + 1][col].ship ||
             board.grid[row + 2][col].ship
           ) {
-            row = Math.round(Math.random() * (10 - hps));
+            row = Math.round(Math.random() * (10 - boat.hps));
             col = Math.round(Math.random() * 9);
           }
           break;
@@ -80,7 +82,7 @@ export const createFleet = (board) => {
             board.grid[row + 2][col].ship ||
             board.grid[row + 3][col].ship
           ) {
-            row = Math.round(Math.random() * (10 - hps));
+            row = Math.round(Math.random() * (10 - boat.hps));
             col = Math.round(Math.random() * 9);
           }
           break;
@@ -92,13 +94,13 @@ export const createFleet = (board) => {
             board.grid[row + 3][col].ship ||
             board.grid[row + 4][col].ship
           ) {
-            row = Math.round(Math.random() * (10 - hps));
+            row = Math.round(Math.random() * (10 - boat.hps));
             col = Math.round(Math.random() * 9);
           }
           break;
       }
       console.log(row, col, dir);
-      board.newShip(row, col, hps, "y");
+      board.newShip(row, col, boat.hps, boat.name, "y");
     }
   });
 };
@@ -118,6 +120,7 @@ export const newGame = () => {
 
 }
 
+// AI attack function.  Calls attack method from the player object, returns the row and col values targeted in an array
 export const AIAttackTurn = (player, ai) => {
     let row = Math.round(Math.random() * 9)
     let col = Math.round(Math.random() * 9)
@@ -126,7 +129,16 @@ export const AIAttackTurn = (player, ai) => {
         row = Math.round(Math.random() * 9)
         col = Math.round(Math.random() * 9)
     }
-    let x = ai.attack(player, row, col)
-    console.log("ai", x)
-    return [row,col]
+    let msg = ai.attack(player, row, col)
+    console.log("ai", msg)
+    return {
+      "row": row,
+      "col": col,
+      "msg": msg
+    }
+}
+
+// Game over function.  Detects if the game is over by calling the allSunk method from the gameboard objects.  Input paramenter is a gameboard object
+export const gameOver = () => {
+
 }

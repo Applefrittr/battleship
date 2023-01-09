@@ -1,11 +1,12 @@
 
 // ship factory function, will be used to create ship objects to be used on the gameboard.  2 public methods to be used by gameboard
-export const ship = (input) => {
+export const ship = (input, name) => {
     let hps = input,
         dmg = 0
 
     return {
         hps,
+        name,
         hit() {
             dmg++
             return this
@@ -43,8 +44,8 @@ export const gameboard = (dim) => {
         totalhps,
         // places a new ship() object on the grid using the provided row and col parameters as the start postion.  hps determines the type of ship placed and defaults
         // the palcement along the x-axis
-        newShip(row, col, hps, axis = 'x') {
-            const ship1 = ship(hps)
+        newShip(row, col, hps, name, axis = 'x') {
+            const ship1 = ship(hps, name)
             this.totalhps += hps
 
             if (axis === 'x') {
@@ -64,17 +65,18 @@ export const gameboard = (dim) => {
         // property to that square object.  If a ship is found, call the hit() on that ship as well as assigned an attacked property to that square while returning a "hit" string
         recieveAttack(row, col) {
             const square = this.grid[row][col]
-            if (square.attacked) return "Location has already been attacked..."
+            if (square.attacked) return "Target already been fired on, select new target..."
             else if (square.ship) {
                 square.attacked = true
                 square.ship.hit()
                 this.hits++
-                return "Direct hit!"
+                if (square.ship.isSunk()) return `Direct Hit - ${square.ship.name} Destroyed!`
+                else return "Direct Hit!"
             }
             else {
                 square.attacked = true
                 this.misses++
-                return "Torpedo miss..."
+                return "Target Miss..."
             }
         },
         // method to determine if all ships on grid have been sunk, resulting in a game end

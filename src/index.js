@@ -8,7 +8,7 @@ const title = document.querySelector("#battleship");
 const body = document.querySelector("body");
 
 let audio = new Audio("Battlefield 1942.mp3");
-audio.play();
+//audio.play();
 audio.loop = true;
 
 volume.addEventListener("click", () => {
