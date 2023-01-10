@@ -8,6 +8,13 @@
     src: url(MachineStd.otf);
 }
 
+@keyframes shake {
+    0%      {transform: translateX(5px);}
+    33%     {transform: translateX(-10px);}
+    66%     {transform: translateX(10px);}
+    100%    {transform: translateX(-5px);}
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -45,12 +52,23 @@ body {
 
 #new-game {
     position: absolute;
-    top: 60%;
+    top: 65%;
+    border: 1px limegreen solid;
+    background-color: black;
+    color: limegreen;
+    padding: 8px 16px;
+}
+
+#new-game:hover {
+    background-color: rgba(0, 255, 10, .25)
+}
+
+#new-game:active {
+    transform: scale(95%);
 }
 
 .screen-display {
     width: 100%;
-    /* background: linear-gradient(rgba(225,225,225), rgb(78, 78, 78), rgba(225,225,225)); */
     background-color: black;
     margin: 160px 0;
     display: flex;
@@ -93,8 +111,8 @@ body {
 }
 
 .grid-square {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background-color: black;
     border:solid limegreen 1px;
     display: flex;
@@ -115,7 +133,7 @@ body {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(10, 50px);
+    grid-template-columns: repeat(10, 40px);
     grid-template-rows: repeat(10, 1fr);
     padding: 5rem;
     position: relative;
@@ -130,9 +148,38 @@ body {
     transform: translateX(-50%)
 }
 
+.ships1-display {
+    height: 400px;
+    width: 200px;
+    position: absolute;
+    left: -150px;
+    top:80px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ships2-display {
+    height: 400px;
+    width: 200px;
+    position: absolute;
+    right: -130px;
+    top:80px;
+    display: flex;
+    flex-direction: column;
+}
+
 .ship-icons {
     width: 225px;
     height: 75px;
+    transition: ease-out opacity 2s;
+}
+
+.shake {
+    animation: shake .50s;
+}
+
+.sink {
+    opacity: 0;
 }
 
 .modal {
@@ -152,4 +199,20 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+footer {
+    color: limegreen;
+    position: absolute;
+    bottom: 16px;
+    margin: auto;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+a>img {
+    width: 24px;
+    height: auto;
 }

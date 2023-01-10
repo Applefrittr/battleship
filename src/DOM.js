@@ -1,9 +1,9 @@
 import { AIAttackTurn, newGame } from "./game.js";
-import BATTLESHIP from "./assets/battleship1.png"
-import CARRIER from "./assets/carrier.png"
-import DESTROYER from "./assets/destroyer.png"
-import SUBMARINE from "./assets/submarine.png"
-import PATROLBOAT from "./assets/patrolboat.png"
+import BATTLESHIP from "./assets/battleship1.png";
+import CARRIER from "./assets/carrier.png";
+import DESTROYER from "./assets/destroyer.png";
+import SUBMARINE from "./assets/submarine.png";
+import PATROLBOAT from "./assets/patrolboat.png";
 
 const body = document.querySelector("body");
 
@@ -24,7 +24,8 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
   display.appendChild(msgbanner);
 
   const msgoutput = document.createElement("p");
-  msgoutput.textContent = "Commander, enemy fleet in range. Select coordinates, fire!";
+  msgoutput.textContent =
+    "Commander, enemy fleet in range. Select coordinates, fire!";
   msgoutput.classList.add("msg-output");
   msgbanner.appendChild(msgoutput);
 
@@ -32,8 +33,8 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
   placeholder.classList.add("placeholder");
   msgbanner.appendChild(placeholder);
   setInterval(() => {
-    placeholder.classList.toggle("black")
-  }, 500)
+    placeholder.classList.toggle("black");
+  }, 500);
 
   const gridContainer = document.createElement("div");
   gridContainer.classList.add("grid-container");
@@ -59,10 +60,46 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
     }
   }
 
-  const grid1name = document.createElement('div')
-  grid1name.textContent = "Allied Fleet"
-  grid1name.classList.add("grid-name")
-  DOMgrid1.appendChild(grid1name)
+  const grid1name = document.createElement("div");
+  grid1name.textContent = "Allied Fleet";
+  grid1name.classList.add("grid-name");
+  DOMgrid1.appendChild(grid1name);
+
+  // Create ship icons for Allied fleet
+  const ships1 = document.createElement("div");
+  ships1.classList.add("ships1-display");
+  DOMgrid1.appendChild(ships1);
+
+  const battleship1 = document.createElement("img");
+  battleship1.classList.add("ship-icons");
+  battleship1.src = BATTLESHIP;
+  battleship1.id = "Battleship1";
+
+  const carrier1 = document.createElement("img");
+  carrier1.classList.add("ship-icons");
+  carrier1.src = CARRIER;
+  carrier1.id = "Carrier1";
+
+  const destroyer1 = document.createElement("img");
+  destroyer1.classList.add("ship-icons");
+  destroyer1.src = DESTROYER;
+  destroyer1.id = "Destroyer1";
+
+  const submarine1 = document.createElement("img");
+  submarine1.classList.add("ship-icons");
+  submarine1.src = SUBMARINE;
+  submarine1.id = "Submarine1";
+
+  const patrolboat1 = document.createElement("img");
+  patrolboat1.classList.add("ship-icons");
+  patrolboat1.src = PATROLBOAT;
+  patrolboat1.id = "Patrol Boat1";
+
+  ships1.appendChild(carrier1);
+  ships1.appendChild(battleship1);
+  ships1.appendChild(destroyer1);
+  ships1.appendChild(submarine1);
+  ships1.appendChild(patrolboat1);
 
   // Grid 2 / Player 2 (AI player).  Grid created will have squares that contain listener events to recieve attacks from player 1.  Ships will NOT be revealed and squares will have color indicators to indicate hits or misses.
   const DOMgrid2 = document.createElement("div");
@@ -88,12 +125,15 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
           }, 250);
           msgoutput.textContent = "";
           timeout = typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
-        } else if (msg === "Target already been fired on, select new target...") {
+        } else if (
+          msg === "Target already been fired on, select new target..."
+        ) {
           msgoutput.textContent = "";
           timeout = typeWriter(msg, msgoutput);
-           return;
+          return;
         } else {
           addPeg(square, 2);
+          shipSunk(msg, 2);
           msgoutput.textContent = "";
           timeout = typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
           if (board2.allSunk()) {
@@ -102,67 +142,75 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
           }
         }
 
-        
         setTimeout(() => {
-          timeout.forEach((time) => clearTimeout(time))
+          timeout.forEach((time) => clearTimeout(time));
           // AI attack turn.  Once the attack completes, player grid UI will update to represent the AI's attack target
           let attack = AIAttackTurn(player1, player2);
           // targets the square in the player's grid with the coordinate ID, then color is updated accordining to attack outcome
-          let target = document.getElementById(
-            `${attack.row}by${attack.col}`
-          );
+          let target = document.getElementById(`${attack.row}by${attack.col}`);
           if (player1.grid[attack.row][attack.col].ship) {
             addPeg(target, 2);
+            shipSunk(attack.msg, 1);
             msgoutput.textContent = "";
-            timeout = [...timeout, typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput)];
+            timeout = [
+              ...timeout,
+              typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput),
+            ];
             if (board1.allSunk()) {
               gameOver(2);
             }
           } else {
             msgoutput.textContent = "";
-            timeout = [...timeout, typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput)];
+            timeout = [
+              ...timeout,
+              typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput),
+            ];
             addPeg(target, 1);
           }
         }, 2000);
       });
-
-
     }
   }
-  const grid2name = document.createElement('div')
-  grid2name.textContent = "Enemy Fleet"
-  grid2name.classList.add("grid-name")
-  DOMgrid2.appendChild(grid2name)
+  const grid2name = document.createElement("div");
+  grid2name.textContent = "Enemy Fleet";
+  grid2name.classList.add("grid-name");
+  DOMgrid2.appendChild(grid2name);
 
-  ////////////////
-  const ships = document.createElement("div")
-  body.appendChild(ships)
+  // Create ship icons for Enemy fleet
+  const ships2 = document.createElement("div");
+  ships2.classList.add("ships2-display");
+  DOMgrid2.appendChild(ships2);
 
-  const battleship1 = document.createElement("img")
-  battleship1.classList.add("ship-icons")
-  battleship1.src = BATTLESHIP
+  const battleship2 = document.createElement("img");
+  battleship2.classList.add("ship-icons");
+  battleship2.src = BATTLESHIP;
+  battleship2.id = "Battleship2";
 
-  const carrier1 = document.createElement("img")
-  carrier1.classList.add("ship-icons")
-  carrier1.src = CARRIER
+  const carrier2 = document.createElement("img");
+  carrier2.classList.add("ship-icons");
+  carrier2.src = CARRIER;
+  carrier2.id = "Carrier2";
 
-  const destroyer1 = document.createElement("img")
-  destroyer1.classList.add("ship-icons")
-  destroyer1.src = DESTROYER
+  const destroyer2 = document.createElement("img");
+  destroyer2.classList.add("ship-icons");
+  destroyer2.src = DESTROYER;
+  destroyer2.id = "Destroyer2";
 
-  const submarine1 = document.createElement("img")
-  submarine1.classList.add("ship-icons")
-  submarine1.src = SUBMARINE
+  const submarine2 = document.createElement("img");
+  submarine2.classList.add("ship-icons");
+  submarine2.src = SUBMARINE;
+  submarine2.id = "Submarine2";
 
-  const patrolboat1 = document.createElement("img")
-  patrolboat1.classList.add("ship-icons")
-  patrolboat1.src = PATROLBOAT
+  const patrolboat2 = document.createElement("img");
+  patrolboat2.classList.add("ship-icons");
+  patrolboat2.src = PATROLBOAT;
+  patrolboat2.id = "Patrol Boat2";
 
-  ships.appendChild(battleship1)
-  ships.appendChild(carrier1)
-  ships.appendChild(destroyer1)
-  ships.appendChild(submarine1)
-  ships.appendChild(patrolboat1)
+  ships2.appendChild(carrier2);
+  ships2.appendChild(battleship2);
+  ships2.appendChild(destroyer2);
+  ships2.appendChild(submarine2);
+  ships2.appendChild(patrolboat2);
 };
 
 // Game Over function.  Creates a modal overlay displaying the game outcome and a button for a new game.  Input parameter is the player number, which is used to determine if player wins or loses
@@ -211,10 +259,34 @@ const typeWriter = (text, element, index = 0, timeoutArray = []) => {
 };
 
 // Adds a new element to the grid squares when it's attacked, representative of the pegs in battleship boardgame
+// msg === 1 indicates a white peg/miss, msg === 2 indicates a red peg/hit
 const addPeg = (gridSquare, msg) => {
   const peg = document.createElement("div");
   peg.classList.add("peg");
   gridSquare.appendChild(peg);
   if (msg === 1) peg.style.backgroundColor = "white";
   else peg.style.backgroundColor = "red";
+};
+
+// Ship icon sunk function.  Will change the color of the ship icons for either player to indicate ship status.  Params will be message output from player attack function and the player that is targetted.
+// player == 1 is human, player == 2 is AI
+const shipSunk = (msg, player) => {
+  let ships = [
+    "Carrier",
+    "Destroyer",
+    "Battleship",
+    "Submarine",
+    "Patrol Boat",
+  ];
+  for (let i = 0; i < ships.length; i++) {
+    if (msg.includes(ships[i])) {
+      let targetShip = ships[i];
+      let targetIcon = document.getElementById(targetShip + player); // Type coercion to add the ship name and player number to get ID of specific ship icon
+      targetIcon.classList.add("shake");
+      setTimeout(() => {
+        targetIcon.classList.add("sink")
+      }, 750)
+      break;
+    }
+  }
 };
