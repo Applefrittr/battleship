@@ -102,7 +102,7 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
   ships1.appendChild(submarine1);
   ships1.appendChild(patrolboat1);
 
-  // Grid 2 / Player 2 (AI player).  Grid created will have squares that contain listener events to recieve attacks from player 1.  Ships will NOT be revealed and squares will have color indicators to indicate hits or misses.
+  // Grid 2 / Player 2 (AI player).  Grid created will have squares that contain listener events to to fire the turnLoop function.  Ships will NOT be revealed and squares will have color indicators to indicate hits or misses.
   const DOMgrid2 = document.createElement("div");
   DOMgrid2.classList.add("grid");
   gridContainer.appendChild(DOMgrid2);
@@ -113,66 +113,13 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
       square.classList.add("grid-square");
       DOMgrid2.appendChild(square);
 
-      // This particular event listener fucntions as the game loop, once the player selects a target square to attack, the AI then attacks in turn (AIAttackTurn method called from game.js)
+      // This particular event listener fucntions as the game loop, calls turnLoop() and disables cursor events for 3 seconds to set game tempo
       square.addEventListener("click", () => {
-        msgoutput.textContent = "";
-        timeout.forEach((time) => clearTimeout(time)); // Clears the event queue of prior typeWriter outputs
-        //console.log(timeout);
-
-        let msg = player1.attack(player2, row, col);
-        if (msg === "Target Miss...") {
-          setTimeout(() => {
-            addPeg(square, 1);
-          }, 250);
-          msgoutput.textContent = "";
-          timeout = typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
-        } else if (
-          msg === "Target already been fired on, select new target..."
-        ) {
-          msgoutput.textContent = "";
-          timeout = typeWriter(msg, msgoutput);
-          return;
-        } else {
-          addPeg(square, 2);
-          shipSunk(msg, 2);
-          msgoutput.textContent = "";
-          timeout = typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
-          if (board2.allSunk()) {
-            setTimeout(() => {
-              gameOver(1);
-            }, 2000);
-            return;
-          }
-        }
-
+        DOMgrid2.style.pointerEvents = "none";
+        turnLoop(square, player1, player2, board1, board2, row, col);
         setTimeout(() => {
-          timeout.forEach((time) => clearTimeout(time));
-          // AI attack turn.  Once the attack completes, player grid UI will update to represent the AI's attack target
-          let attack = AIAttackTurn(player1, player2);
-          // targets the square in the player's grid with the coordinate ID, then color is updated accordining to attack outcome
-          let target = document.getElementById(`${attack.row}by${attack.col}`);
-          if (player1.grid[attack.row][attack.col].ship) {
-            addPeg(target, 2);
-            shipSunk(attack.msg, 1);
-            msgoutput.textContent = "";
-            timeout = [
-              ...timeout,
-              typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput),
-            ];
-            if (board1.allSunk()) {
-              setTimeout(() => {
-                gameOver(2);
-              }, 2000);
-            }
-          } else {
-            msgoutput.textContent = "";
-            timeout = [
-              ...timeout,
-              typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput),
-            ];
-            addPeg(target, 1);
-          }
-        }, 2000);
+          DOMgrid2.style.pointerEvents = "auto";
+        }, 3000);
       });
     }
   }
@@ -282,7 +229,13 @@ export const gameOver = (player) => {
 };
 
 // Typewriter effect for UI displayed messages to the player.  Returns an array of timeout IDs to be targeted in the event queue
-const typeWriter = (text, element, index = 0, timeoutArray = [], interval = 20) => {
+const typeWriter = (
+  text,
+  element,
+  index = 0,
+  timeoutArray = [],
+  interval = 20
+) => {
   if (index < text.length) {
     element.textContent += text.charAt(index);
     index++;
@@ -326,4 +279,57 @@ const shipSunk = (msg, player) => {
       break;
     }
   }
+};
+
+// turnLoop function.  Processes the player's attack then fires an attack for the AI.  Each square in the AI grid will have an onclick event that fires this function.  Paramaters passed
+// are the specific square element and it's row and col coordinates.
+const turnLoop = (square, player1, player2, board1, board2, row, col) => {
+  const msgoutput = document.querySelector(".msg-output");
+
+  msgoutput.textContent = "";
+  let msg = player1.attack(player2, row, col);
+  if (msg === "Target Miss...") {
+    setTimeout(() => {
+      addPeg(square, 1);
+    }, 250);
+    msgoutput.textContent = "";
+    typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
+  } else if (msg === "Target already been fired on, select new target...") {
+    msgoutput.textContent = "";
+    typeWriter(msg, msgoutput);
+    return;
+  } else {
+    addPeg(square, 2);
+    shipSunk(msg, 2);
+    msgoutput.textContent = "";
+    typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
+    if (board2.allSunk()) {
+      setTimeout(() => {
+        gameOver(1);
+      }, 2000);
+      return;
+    }
+  }
+
+  // AI attack turn.  Once the attack completes, player grid UI will update to represent the AI's attack target
+  setTimeout(() => {
+    let attack = AIAttackTurn(player1, player2);
+    // targets the square in the player's grid with the coordinate ID, then color is updated accordining to attack outcome
+    let target = document.getElementById(`${attack.row}by${attack.col}`);
+    if (player1.grid[attack.row][attack.col].ship) {
+      addPeg(target, 2);
+      shipSunk(attack.msg, 1);
+      msgoutput.textContent = "";
+      typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput)
+      if (board1.allSunk()) {
+        setTimeout(() => {
+          gameOver(2);
+        }, 2000);
+      }
+    } else {
+      msgoutput.textContent = "";
+      typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput);
+      addPeg(target, 1);
+    }
+  }, 2000);
 };
