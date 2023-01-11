@@ -9,7 +9,7 @@ const body = document.querySelector("body");
 
 // CreateMainDisplay is called when a new game is started.  Creates DOM elements that represent the player boards (grids) and assigns listener events to each of the grids squares, depending on the player.
 export const createMainDisplay = (player1, player2, board1, board2) => {
-  let timeout = [];
+  let timeout = []; // initialize timeout array to hold timeout IDs, works in conjunction with typeWriter()
 
   const display = document.createElement("div");
   body.appendChild(display);
@@ -29,6 +29,7 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
   msgoutput.classList.add("msg-output");
   msgbanner.appendChild(msgoutput);
 
+  // Blinking cursor/placeholder element and effect used to tail the messages
   const placeholder = document.createElement("div");
   placeholder.classList.add("placeholder");
   msgbanner.appendChild(placeholder);
@@ -137,7 +138,9 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
           msgoutput.textContent = "";
           timeout = typeWriter(`Cannon Battery Fire - ${msg}`, msgoutput);
           if (board2.allSunk()) {
-            gameOver(1);
+            setTimeout(() => {
+              gameOver(1);
+            }, 2000);
             return;
           }
         }
@@ -157,7 +160,9 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
               typeWriter(`Enemy Incoming Fire - ${attack.msg}`, msgoutput),
             ];
             if (board1.allSunk()) {
-              gameOver(2);
+              setTimeout(() => {
+                gameOver(2);
+              }, 2000);
             }
           } else {
             msgoutput.textContent = "";
@@ -214,7 +219,10 @@ export const createMainDisplay = (player1, player2, board1, board2) => {
 };
 
 // Game Over function.  Creates a modal overlay displaying the game outcome and a button for a new game.  Input parameter is the player number, which is used to determine if player wins or loses
-const gameOver = (player) => {
+export const gameOver = (player) => {
+  const display = document.querySelector(".screen-display");
+  display.style.opacity = "0";
+
   const modal = document.createElement("div");
   modal.classList.add("modal");
   body.appendChild(modal);
@@ -222,37 +230,66 @@ const gameOver = (player) => {
   const container = document.createElement("div");
   container.classList.add("modal-container");
   modal.appendChild(container);
+  setTimeout(() => {
+    container.classList.add("fade-in");
+  }, 500);
+
+  const msgContainer = document.createElement("div");
+  msgContainer.classList.add("msg-output");
+  container.appendChild(msgContainer);
 
   // Game outcome message
   const msg = document.createElement("p");
-  container.appendChild(msg);
-  if (player === 1) {
-    msg.textContent = "Enemy Fleet Destroyed, Mission Accomplished!";
-  } else {
-    msg.textContent = "Fleet Destroyed, You Lose!";
-  }
+  msgContainer.appendChild(msg);
+
+  //Blinking curosor/placeholder
+  const placeholder = document.createElement("div");
+  placeholder.classList.add("placeholder");
+  msgContainer.appendChild(placeholder);
+  setInterval(() => {
+    placeholder.classList.toggle("black");
+  }, 500);
+
+  setTimeout(() => {
+    if (player === 1) {
+      typeWriter(
+        "Enemy Fleet Destroyed, Mission Accomplished!",
+        msg,
+        0,
+        [],
+        100
+      );
+    } else {
+      typeWriter("Fleet Destroyed, You Lose!", msg, 0, [], 100);
+    }
+  }, 1500);
 
   // New Game button
-  const nextMission = document.createElement("button");
-  nextMission.textContent = "Next Mission";
-  container.appendChild(nextMission);
-
-  nextMission.addEventListener("click", () => {
-    body.removeChild(body.lastChild); // remove modal
-    body.removeChild(body.lastChild); // remove current game display
-    newGame(); // create a new game
-  });
+  setTimeout(() => {
+    const nextMission = document.createElement("button");
+    nextMission.textContent = "Next Mission";
+    nextMission.classList.add("next-mission");
+    container.appendChild(nextMission);
+    setTimeout(() => {
+      nextMission.classList.add("fade-in");
+    }, 0);
+    nextMission.addEventListener("click", () => {
+      body.removeChild(body.lastChild); // remove modal
+      body.removeChild(body.lastChild); // remove current game display
+      newGame(); // create a new game
+    });
+  }, 8000);
 };
 
 // Typewriter effect for UI displayed messages to the player.  Returns an array of timeout IDs to be targeted in the event queue
-const typeWriter = (text, element, index = 0, timeoutArray = []) => {
+const typeWriter = (text, element, index = 0, timeoutArray = [], interval = 20) => {
   if (index < text.length) {
     element.textContent += text.charAt(index);
     index++;
     timeoutArray.push(
       setTimeout(() => {
-        typeWriter(text, element, index, timeoutArray);
-      }, 20)
+        typeWriter(text, element, index, timeoutArray, interval);
+      }, interval)
     );
   }
   return timeoutArray;
@@ -284,8 +321,8 @@ const shipSunk = (msg, player) => {
       let targetIcon = document.getElementById(targetShip + player); // Type coercion to add the ship name and player number to get ID of specific ship icon
       targetIcon.classList.add("shake");
       setTimeout(() => {
-        targetIcon.classList.add("sink")
-      }, 750)
+        targetIcon.classList.add("sink");
+      }, 750);
       break;
     }
   }

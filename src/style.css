@@ -50,21 +50,24 @@ body {
     margin: 1rem;
 }
 
-#new-game {
-    position: absolute;
-    top: 65%;
+button {
     border: 1px limegreen solid;
     background-color: black;
     color: limegreen;
     padding: 8px 16px;
 }
 
-#new-game:hover {
+button:hover {
     background-color: rgba(0, 255, 10, .25)
 }
 
-#new-game:active {
+button:active {
     transform: scale(95%);
+}
+
+#new-game {
+    position: absolute;
+    top: 65%;
 }
 
 .screen-display {
@@ -92,6 +95,7 @@ body {
 
 .msg-output {
     color: limegreen;
+    display: flex;
 }
 
 .placeholder {
@@ -186,19 +190,33 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .45);
+    /* background-color: rgba(0, 0, 0, .45); */
     display: flex;
     align-items: center;
 }
 
 .modal-container {
-    background-color: white;
+    background-color: black;
+    color: limegreen;
     width: 100%;
     height: 150px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    font-size: 2rem;
+    opacity: 0;
+    transition: opacity ease-in 1s;
+    gap: 2rem;
+}
+
+.next-mission {
+    opacity: 0;
+    transition: opacity ease-in 1s;
+}
+
+.fade-in {
+    opacity: 1;
 }
 
 footer {
